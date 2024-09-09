@@ -254,6 +254,8 @@ static struct psi_threshold psi_thresholds[VMPRESS_LEVEL_COUNT] = {
     { PSI_FULL, 70 },    /* 70ms out of 1sec for complete stall */
 };
 
+static uint64_t mp_event_count;
+
 static android_log_context ctx;
 static Reaper reaper;
 static int reaper_comm_fd[2];
@@ -2899,6 +2901,12 @@ static void mp_event_psi(int data, uint32_t events, struct polling_params *poll_
     long direct_reclaim_duration_ms;
     bool in_kswapd_reclaim;
 
+    mp_event_count++;
+    if (debug_process_killing) {
+        ALOGI("%s memory pressure event #%" PRIu64 " is triggered",
+              level_name[level], mp_event_count);
+    }
+
     if (clock_gettime(CLOCK_MONOTONIC_COARSE, &curr_tm) != 0) {
         ALOGE("Failed to get current time");
         return;
@@ -3263,8 +3271,10 @@ static void mp_event_common(int data, uint32_t events, struct polling_params *po
     };
     static struct wakeup_info wi;
 
+    mp_event_count++;
     if (debug_process_killing) {
-        ALOGI("%s memory pressure event is triggered", level_name[level]);
+        ALOGI("%s memory pressure event #%" PRIu64 " is triggered",
+              level_name[level], mp_event_count);
     }
 
     if (!use_psi_monitors) {
@@ -3775,6 +3785,8 @@ static void kernel_event_handler(int data __unused, uint32_t events __unused,
 }
 
 static bool init_monitors() {
+    ALOGI("Wakeup counter is reset from %" PRIu64 " to 0", mp_event_count);
+    mp_event_count = 0;
     /* Try to use psi monitor first if kernel has it */
     use_psi_monitors = GET_LMK_PROPERTY(bool, "use_psi", true) &&
         init_psi_monitors();
