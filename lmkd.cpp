@@ -2620,7 +2620,7 @@ static bool is_not_excluded(char *do_not_kill_tasknames, char *taskname) {
     strncpy(tasknames, do_not_kill_tasknames, len);
 
     /* Allocate memory for the array */
-    char **taskname_dict = malloc(num_tasknames * sizeof(char *));
+    char **taskname_dict = new char *[num_tasknames];
 
     /* Split the tasknames and store */
     int i = 0;
@@ -2639,6 +2639,9 @@ static bool is_not_excluded(char *do_not_kill_tasknames, char *taskname) {
         }
     }
 
+    for (int i = 0; i < num_tasknames; i++) {
+        free(taskname_dict[i]);
+    }
     free(tasknames);
     free(taskname_dict);
 
