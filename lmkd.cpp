@@ -3830,6 +3830,7 @@ static void call_handler(struct event_handler_info* handler_info,
          */
         poll_params->poll_start_tm = curr_tm;
         poll_params->poll_handler = handler_info;
+        poll_params->last_poll_tm = curr_tm;
         break;
     case POLLING_PAUSE:
         poll_params->paused_handler = handler_info;
