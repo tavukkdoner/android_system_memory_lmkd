@@ -2459,7 +2459,7 @@ static bool is_not_excluded(char *taskname) {
 
     /* Check if is killable */
     for (int i = 0; i < num_tasknames; i++) {
-        if (!strncmp(taskname_dict[i], taskname, strlen(taskname))) {
+        if (!strncmp(taskname, taskname_dict[i], strlen(taskname_dict[i]))) {
             is_killable = false;
             break;
         }
